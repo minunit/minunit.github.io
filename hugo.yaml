@@ -1,41 +1,31 @@
-baseurl: https://example.com/
-languageCode: en-us
+baseurl: https://minunit.github.io
+languageCode: zh-cn
 theme: hugo-theme-stack
-title: Example Site
-copyright: Example Person
+title: minunit
+# copyright: Keep going upwards.
 
 # Theme i18n support
 # Available values: ar, bn, ca, de, el, en, es, fr, hu, id, it, ja, ko, nl, pt-br, th, uk, zh-cn, zh-hk, zh-tw
-DefaultContentLanguage: en
+DefaultContentLanguage: zh-cn
 
 # Set hasCJKLanguage to true if DefaultContentLanguage is in [zh-cn ja ko]
 # This will make .Summary and .WordCount behave correctly for CJK languages.
 hasCJKLanguage: false
-
 languages:
-    en:
-        languageName: English
-        title: Example Site
+    # en:
+    #     languageName: English
+    #     title: minunit
+    #     weight: 1
+    #     params:
+    #         sidebar:
+    #             subtitle: Keep going upwards.
+    zh-cn:
+        languageName: 中文
+        title: minunit
         weight: 1
         params:
             sidebar:
-                subtitle: Example description
-    zh-cn:
-        languageName: 中文
-        title: 演示站点
-        weight: 2
-        params:
-            sidebar:
-                subtitle: 演示说明
-    ar:
-        languageName: عربي
-        languagedirection: rtl
-        title: موقع تجريبي
-        weight: 3
-        params:
-            sidebar:
-                subtitle: وصف تجريبي
-
+                subtitle: Keep going upwards.
 services:
     # Change it to your Disqus shortname before using
     disqus:
@@ -53,6 +43,7 @@ permalinks:
 
 params:
     mainSections:
+        - kubernetes
         - post
     featuredImageField: image
     rssFullContent: true
@@ -67,6 +58,7 @@ params:
         lastUpdated: Jan 02, 2006 15:04 MST
 
     sidebar:
+        compact: false
         emoji: 🍥
         subtitle: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
         avatar:
@@ -217,15 +209,15 @@ menu:
     social:
         - identifier: github
           name: GitHub
-          url: https://github.com/CaiJimmy/hugo-theme-stack
+          url: https://github.com/minunit/minunit.github.io
           params:
               icon: brand-github
 
-        - identifier: twitter
-          name: Twitter
-          url: https://twitter.com
-          params:
-              icon: brand-twitter
+        # - identifier: twitter
+        #   name: Twitter
+        #   url: https://twitter.com
+        #   params:
+        #       icon: brand-twitter
 
 related:
     includeNewer: true
