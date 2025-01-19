@@ -353,6 +353,7 @@ Note: 这里通过yml文件的方式进行部署
 ### 初始化K8S
 ```bash
 ### 配置kubeadm-config.yaml
+## 官方文档 https://kubernetes.io/docs/reference/config-api/kubeadm-config.v1beta3/
 cat > /etc/kubernetes/kubeadm-config.yaml <<EOF
 apiVersion: kubeadm.k8s.io/v1beta3
 kind: InitConfiguration
@@ -411,7 +412,7 @@ kubeadm join 192.168.31.100:6443 --token ph2mh3.5s04nehxqumvia6u \
 --discovery-token-ca-cert-hash sha256:683dfa2d87508e63862d6bd24676eb773126a670c96c10a71134f8c5ba3450a6 
 ```
 ### 加入控制平面集群
-Note: 在日志中的命令中，加入--cri-socket unix:///var/run/cri-dockerd.sock，制具体的cri
+Note: 在日志中的命令中，加入--cri-socket unix:///var/run/cri-dockerd.sock，指定具体的cri
 ```bash
 kubeadm join 192.168.31.100:6443 --token ph2mh3.5s04nehxqumvia6u \
 --discovery-token-ca-cert-hash sha256:683dfa2d87508e63862d6bd24676eb773126a670c96c10a71134f8c5ba3450a6 \
@@ -419,11 +420,61 @@ kubeadm join 192.168.31.100:6443 --token ph2mh3.5s04nehxqumvia6u \
 --control-plane
 ```
 ### 加入Node节点
-```bash
+```bash 
 kubeadm join 192.168.31.100:6443 --token ph2mh3.5s04nehxqumvia6u \
 --discovery-token-ca-cert-hash sha256:683dfa2d87508e63862d6bd24676eb773126a670c96c10a71134f8c5ba3450a6 
 # 这里如果Node节点想要使用kubelet命令，可以做以下操作
 scp /etc/kubernetes/admin.conf root@192.168.31.30:/etc/kubernetes
 echo "export KUBECONFIG=/etc/kubernetes/admin.conf" >> ~/.bash_profile
 source ~/.bash_profile
+```
+### 查看节点状态
+Note: 由于电脑性能有限，这里并没有只有一个control plan
+
+``` bash
+  [root@k8s-master ~]# kubectl get node
+  NAME          STATUS      ROLES           AGE   VERSION
+  k8s-master    NotReady    control-plane   0     v1.30.8
+  k8s-node-30   NotReady    <none>          0     v1.30.8
+  k8s-node-31   NotReady    <none>          0     v1.30.8
+```
+
+此时会发现节点属于NotReady的状态，是由于并没有安装网络，所以会出现NotReady，安装好网络即可
+
+## 安装Calico网络插件
+```bash
+wget https://github.com/projectcalico/calico/releases/download/v3.29.1/release-v3.29.1.tgz
+tar xvf release-v3.29.1.tgz
+# 修改docker镜像, 如果网络可达docker.io可不做修改
+sed -i 's#docker.io/##g' calico.yaml
+```
+这里需要加入自动选择IP的方式，通过ens33的网卡来进行
+```bash
+# 在 - name: CALICO_IPV4POOL_IPIP 上面加入
+- name: IP_AUTODETECTION_METHOD
+  value: interface=ens33
+```
+
+等安装完成后，查看节点状态，即可发现已经变成Ready.
+``` bash
+  [root@k8s-master ~]# kubectl get node
+  NAME          STATUS    ROLES         AGE   VERSION
+  k8s-master    Ready    control-plane   0     v1.30.8
+  k8s-node-30   Ready    <none>          0     v1.30.8
+  k8s-node-31   Ready    <none>          0     v1.30.8
+```
+至此k8s集群安装完成，但并不满足真正生产的使用条件，后续还需要安装一些服务
+1. Ingress/Gateway对外开放服务
+2. 安装Rancher，k8s管理平台，通过页面进行管理
+3. gitlab + jenkines 进行自动化部署到K8S
+4. harbor 完成私有化镜像
+5. ELK 完成日志监控
+6. Prometheus 监控K8S集群，以及服务状态，各种报警等
+
+### 安装calicoctl
+Note: 这里不是必需的，有需要可以安装
+```bash
+curl -O -L https://github.com/projectcalico/calico/releases/download/v3.29.1/calicoctl-linux-amd64
+chmod +x calicoctl-linux-amd64
+sudo mv calicoctl-linux-amd64 /usr/local/bin/calicoctl
 ```
