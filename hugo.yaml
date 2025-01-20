@@ -76,7 +76,7 @@ params:
 
     comments:
         enabled: true
-        provider: disqus
+        provider: gitalk
 
         disqusjs:
             shortname:
@@ -146,14 +146,14 @@ params:
             darkTheme:
             reactionsEnabled: 1
             emitMetadata: 0
-
         gitalk:
-            owner:
+            owner: minunit
             admin:
-            repo:
-            clientID:
-            clientSecret:
-            proxy:
+                - minunit
+            repo: minunit.github.io
+            clientID: "{{ getenv \"GITALK_CLIENT_ID\" }}"
+            clientSecret: "{{ getenv \"GITALK_CLIENT_SECRET\" }}"
+            proxy: https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token
 
         cusdis:
             host:
